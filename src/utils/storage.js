@@ -76,6 +76,14 @@ export const saveSalonData = (data) => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
 };
 
+export const resetSalonData = () => {
+  const defaultData = getDefaultData();
+  if (!hasStorage()) return defaultData;
+
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+  return defaultData;
+};
+
 const buildBookingId = () =>
   `bk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 

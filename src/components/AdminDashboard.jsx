@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDateLabel } from "../utils/date";
-import { readSalonData, strikeUserForBooking, updateBookingStatus } from "../utils/storage";
+import {
+  readSalonData,
+  resetSalonData,
+  strikeUserForBooking,
+  updateBookingStatus
+} from "../utils/storage";
 
 const statusStyleMap = {
   booked: "bg-sky-100 text-sky-800",
@@ -17,6 +22,7 @@ const statusLabelMap = {
 function AdminDashboard() {
   const [allBookings, setAllBookings] = useState([]);
   const [users, setUsers] = useState({});
+  const [devMessage, setDevMessage] = useState("");
 
   const refreshState = () => {
     const data = readSalonData();
@@ -50,6 +56,17 @@ function AdminDashboard() {
     refreshState();
   };
 
+  const handleClearLocalStorage = () => {
+    const confirmed = window.confirm(
+      "確定要清除本機所有 Demo 資料嗎？此動作會刪除全部預約與客戶狀態。"
+    );
+    if (!confirmed) return;
+
+    resetSalonData();
+    refreshState();
+    setDevMessage("Developer: localStorage salon_data 已清空並重置。");
+  };
+
   const groupedByDate = useMemo(() => {
     return allBookings.reduce((acc, booking) => {
       if (!acc[booking.date]) acc[booking.date] = [];
@@ -71,7 +88,22 @@ function AdminDashboard() {
       <header className="space-y-2">
         <h2 className="text-xl font-bold text-slate-900">💻 老闆後台 Dashboard</h2>
         <p className="text-sm text-slate-600">顯示所有日期預約紀錄</p>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={handleClearLocalStorage}
+            className="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100"
+          >
+            Developer: Clear localStorage
+          </button>
+        </div>
       </header>
+
+      {devMessage && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {devMessage}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">

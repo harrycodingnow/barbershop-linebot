@@ -78,25 +78,27 @@ function App() {
             </div>
           </div>
 
-          <nav className="flex flex-wrap gap-2">
-            {NAV_ITEMS.map((item) => {
-              const isActive = activeView === item.key;
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => navigateToView(item.key)}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    isActive
-                      ? "bg-teal-600 text-white shadow"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
+          {activeView !== "admin" && (
+            <nav className="flex flex-wrap gap-2">
+              {NAV_ITEMS.map((item) => {
+                const isActive = activeView === item.key;
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => navigateToView(item.key)}
+                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      isActive
+                        ? "bg-teal-600 text-white shadow"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+          )}
         </header>
 
         {renderView()}
