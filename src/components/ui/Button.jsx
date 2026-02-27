@@ -2,6 +2,7 @@ import { cn } from "../../utils/cn";
 
 const variantClassMap = {
   primary: "bg-black text-white hover:bg-white hover:text-black",
+  selected: "bg-black text-white hover:bg-black hover:text-white",
   outline: "bg-white text-black hover:bg-black hover:text-white",
   ghost: "border-transparent bg-transparent px-0 py-0 text-black hover:underline",
   muted: "bg-neutral-100 text-black hover:bg-neutral-200"

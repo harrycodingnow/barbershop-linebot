@@ -131,7 +131,7 @@ function WalkInBooking({ currentUser }) {
           {availableSlots.map((slot) => (
             <Button
               key={slot}
-              variant={selectedSlot === slot ? "primary" : "outline"}
+              variant={selectedSlot === slot ? "selected" : "outline"}
               onClick={() => {
                 if (existingBooking) return;
                 setSelectedSlot(slot);

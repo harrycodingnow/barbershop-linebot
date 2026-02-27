@@ -84,16 +84,18 @@ function OnlineBooking({ currentUser }) {
         <label className="block text-center text-xs font-mono uppercase tracking-[0.12em] text-neutral-600 md:text-left">
           Booking Date
         </label>
-        <input
-          type="date"
-          min={tomorrow}
-          value={selectedDate}
-          onChange={(event) => {
-            setSelectedDate(event.target.value);
-            setSelectedSlot("");
-          }}
-          className="mx-auto block w-full max-w-sm border-2 border-black bg-white px-3 py-3 text-center font-mono text-sm focus:border-[3px] focus:outline-none md:mx-0 md:text-left"
-        />
+        <div className="flex justify-center md:justify-start">
+          <input
+            type="date"
+            min={tomorrow}
+            value={selectedDate}
+            onChange={(event) => {
+              setSelectedDate(event.target.value);
+              setSelectedSlot("");
+            }}
+            className="w-[18rem] max-w-full border-2 border-black bg-white px-3 py-3 text-center font-mono text-sm focus:border-[3px] focus:outline-none"
+          />
+        </div>
       </Card>
 
       <Card className="space-y-6">
@@ -118,7 +120,7 @@ function OnlineBooking({ currentUser }) {
             return (
               <Button
                 key={slot}
-                variant={isActive ? "primary" : "outline"}
+                variant={isActive ? "selected" : "outline"}
                 onClick={() => setSelectedSlot(slot)}
                 className="w-full font-mono text-sm"
               >
