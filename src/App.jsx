@@ -3,6 +3,7 @@ import WalkInBooking from "./components/WalkInBooking";
 import OnlineBooking from "./components/OnlineBooking";
 import AdminDashboard from "./components/AdminDashboard";
 import { initSalonData } from "./utils/storage";
+import Button from "./components/ui/Button";
 
 const CURRENT_USER = {
   lineUserId: "user_123",
@@ -61,47 +62,46 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-6 md:px-8">
-      <section className="mx-auto w-full max-w-4xl rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-xl shadow-slate-200/70 backdrop-blur md:p-8">
-        <header className="mb-6 space-y-4 border-b border-slate-100 pb-5">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium text-teal-700">
-                LIFF Demo / 單機 localStorage 模式
+    <main className="min-h-screen px-6 py-10 md:px-8 lg:px-12">
+      <section className="mx-auto w-full max-w-6xl">
+        <header className="space-y-8 border-b-4 border-black pb-8">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+            <div className="space-y-4">
+              <p className="font-mono text-xs uppercase tracking-[0.14em] text-neutral-600">
+                LIFF Demo / Local Storage Mode
               </p>
-              <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
-                在地理髮店預約系統 MVP
+              <h1 className="font-display text-5xl tracking-tight md:text-7xl lg:text-8xl">
+                Salon Booking
               </h1>
+              <p className="max-w-2xl text-base text-neutral-700 md:text-lg">
+                專為理髮店展示流程的預約系統。所有狀態與紀錄都儲存在瀏覽器本機。
+              </p>
             </div>
-            <div className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
-              Demo 客人：{CURRENT_USER.displayName} ({CURRENT_USER.lineUserId})
+            <div className="border-2 border-black px-4 py-3 font-mono text-xs uppercase tracking-[0.12em]">
+              Demo User: {CURRENT_USER.displayName} / {CURRENT_USER.lineUserId}
             </div>
           </div>
 
           {activeView !== "admin" && (
-            <nav className="flex flex-wrap gap-2">
+            <nav className="flex flex-wrap gap-3" aria-label="Booking Views">
               {NAV_ITEMS.map((item) => {
                 const isActive = activeView === item.key;
                 return (
-                  <button
+                  <Button
                     key={item.key}
-                    type="button"
                     onClick={() => navigateToView(item.key)}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      isActive
-                        ? "bg-teal-600 text-white shadow"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                    }`}
+                    variant={isActive ? "primary" : "outline"}
+                    className="min-w-[160px]"
                   >
                     {item.label}
-                  </button>
+                  </Button>
                 );
               })}
             </nav>
           )}
         </header>
 
-        {renderView()}
+        <section className="pt-8">{renderView()}</section>
       </section>
     </main>
   );

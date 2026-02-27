@@ -9,6 +9,9 @@ import {
   createBooking,
   getTakenSlotsByDate
 } from "../utils/storage";
+import Badge from "./ui/Badge";
+import Button from "./ui/Button";
+import Card from "./ui/Card";
 
 function OnlineBooking({ currentUser }) {
   const today = useMemo(() => getTodayDateString(), []);
@@ -59,26 +62,27 @@ function OnlineBooking({ currentUser }) {
   };
 
   return (
-    <section className="space-y-5">
-      <header>
-        <h2 className="text-xl font-bold text-slate-900">🔵 線上預約</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          今天（{formatDateLabel(today)}）為鎖定日期，無法線上預約。
+    <section className="space-y-8">
+      <header className="space-y-4">
+        <div className="mono-rule" />
+        <h2 className="text-4xl md:text-5xl">線上預約</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-neutral-600">
+          Tomorrow And Later / Today Locked
         </p>
       </header>
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div className="mb-3">
-          <button
-            type="button"
-            disabled
-            className="rounded-full border border-slate-300 bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-500"
-          >
-            今天 {formatDateLabel(today)}（已鎖定）
-          </button>
+      <Card className="editorial-grid space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black pb-4">
+          <p className="text-lg">選擇預約日期</p>
+          <Badge variant="muted">Today Locked</Badge>
         </div>
-        <label className="mb-2 block text-sm font-semibold text-slate-700">
-          選擇日期（明天起）
+
+        <p className="text-sm text-neutral-700">
+          今天（{formatDateLabel(today)}）不可線上預約，請選擇明天以後日期。
+        </p>
+
+        <label className="block text-xs font-mono uppercase tracking-[0.12em] text-neutral-600">
+          Booking Date
         </label>
         <input
           type="date"
@@ -88,17 +92,23 @@ function OnlineBooking({ currentUser }) {
             setSelectedDate(event.target.value);
             setSelectedSlot("");
           }}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-teal-500 transition focus:ring"
+          className="w-full border-2 border-black bg-white px-3 py-3 font-mono text-sm focus:border-[3px] focus:outline-none"
         />
-      </div>
+      </Card>
 
-      <div>
-        <p className="mb-2 text-sm font-semibold text-slate-700">
-          可預約時段（{formatDateLabel(selectedDate)}）
+      <Card className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-black pb-4">
+          <p className="text-lg">可預約時段</p>
+          <Badge>{formatDateLabel(selectedDate)}</Badge>
+        </div>
+
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-neutral-600">
+          Select One Time Slot
         </p>
+
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {availableSlots.length === 0 && (
-            <p className="col-span-full rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
+            <p className="col-span-full border border-black px-4 py-6 text-center text-sm text-neutral-700">
               此日期已無可預約時段。
             </p>
           )}
@@ -106,61 +116,49 @@ function OnlineBooking({ currentUser }) {
           {availableSlots.map((slot) => {
             const isActive = selectedSlot === slot;
             return (
-              <button
+              <Button
                 key={slot}
-                type="button"
+                variant={isActive ? "primary" : "outline"}
                 onClick={() => setSelectedSlot(slot)}
-                className={`rounded-xl border px-3 py-3 text-sm font-semibold transition ${
-                  isActive
-                    ? "border-amber-500 bg-amber-100 text-amber-800"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-teal-300 hover:bg-teal-50"
-                }`}
+                className="w-full font-mono text-sm"
               >
                 {slot}
-              </button>
+              </Button>
             );
           })}
         </div>
-      </div>
+      </Card>
 
       {feedback && (
-        <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
-          {feedback}
-        </div>
+        <Card inverted>
+          <p className="font-mono text-sm uppercase tracking-[0.08em]">{feedback}</p>
+        </Card>
       )}
 
-      <button
-        type="button"
-        onClick={handleOpenPayment}
-        className="w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-teal-500"
-      >
+      <Button onClick={handleOpenPayment} className="w-full md:w-auto md:min-w-[260px]">
         前往模擬付款
-      </button>
+      </Button>
 
       {openPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
-            <h3 className="text-lg font-bold text-slate-900">模擬金流確認</h3>
-            <p className="mt-2 text-sm text-slate-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md border-4 border-black bg-white p-6">
+            <h3 className="text-3xl">模擬金流確認</h3>
+            <p className="mt-4 text-sm text-neutral-700">
               訂單：{formatDateLabel(selectedDate)} {selectedSlot}
             </p>
-            <p className="mt-1 text-sm text-slate-600">訂金：NT$300（Demo 模擬）</p>
+            <p className="mt-1 text-sm text-neutral-700">訂金：NT$300（Demo 模擬）</p>
 
-            <div className="mt-5 flex gap-3">
-              <button
-                type="button"
+            <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Button
+                variant="outline"
                 onClick={() => setOpenPaymentModal(false)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+                className="w-full"
               >
                 取消
-              </button>
-              <button
-                type="button"
-                onClick={handleMockPayment}
-                className="w-full rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white"
-              >
+              </Button>
+              <Button onClick={handleMockPayment} className="w-full">
                 模擬付款
-              </button>
+              </Button>
             </div>
           </div>
         </div>

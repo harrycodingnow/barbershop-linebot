@@ -4,7 +4,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Noto Sans TC", "ui-sans-serif", "system-ui", "sans-serif"]
+        display: ["Playfair Display", "Georgia", "serif"],
+        serif: ["Source Serif 4", "Georgia", "serif"],
+        mono: ["JetBrains Mono", "monospace"],
+        sans: ["Source Serif 4", "Georgia", "serif"]
       }
     }
   },
