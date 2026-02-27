@@ -15,15 +15,26 @@ function WalkInBooking({ currentUser }) {
   const [isBlacklisted, setIsBlacklisted] = useState(false);
   const [blacklistNotes, setBlacklistNotes] = useState("");
   const [availableSlots, setAvailableSlots] = useState(TIME_SLOTS);
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [existingBooking, setExistingBooking] = useState(null);
   const [feedback, setFeedback] = useState("");
 
   const refreshState = () => {
     const data = readSalonData();
     const userProfile = data.users[currentUser.lineUserId];
     const takenSlots = new Set(getTakenSlotsByDate(today));
+    const todayWalkInBooking =
+      data.bookings.find(
+        (booking) =>
+          booking.type === "walk-in" &&
+          booking.date === today &&
+          booking.lineUserId === currentUser.lineUserId
+      ) || null;
 
     setIsBlacklisted(Boolean(userProfile?.isBlacklisted));
     setBlacklistNotes(userProfile?.notes || "");
+    setExistingBooking(todayWalkInBooking);
+    setSelectedSlot((prev) => prev || todayWalkInBooking?.timeSlot || "");
     setAvailableSlots(TIME_SLOTS.filter((slot) => !takenSlots.has(slot)));
   };
 
@@ -31,19 +42,32 @@ function WalkInBooking({ currentUser }) {
     refreshState();
   }, []);
 
-  const handleWalkInBooking = (timeSlot) => {
+  const handleWalkInBooking = () => {
+    if (!selectedSlot) {
+      setFeedback("請先選擇一個時段。");
+      return;
+    }
     if (isBlacklisted) return;
+    if (existingBooking) {
+      setFeedback("你今天已完成一筆現場預約，無法再次預約。");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `確認預約 ${formatDateLabel(today)} ${selectedSlot} 嗎？`
+    );
+    if (!confirmed) return;
 
     createBooking({
       type: "walk-in",
       date: today,
-      timeSlot,
+      timeSlot: selectedSlot,
       lineUserId: currentUser.lineUserId,
       displayName: currentUser.displayName,
       isDepositPaid: false
     });
 
-    setFeedback(`已完成現場預約：${formatDateLabel(today)} ${timeSlot}`);
+    setFeedback(`已完成現場預約：${formatDateLabel(today)} ${selectedSlot}`);
     refreshState();
   };
 
@@ -91,6 +115,12 @@ function WalkInBooking({ currentUser }) {
           <Badge>{availableSlots.length} Slots</Badge>
         </div>
 
+        {existingBooking && (
+          <p className="border border-black px-4 py-3 text-sm text-neutral-700">
+            你今天已預約 {existingBooking.timeSlot}，每位使用者在現場預約只能預約一個時段。
+          </p>
+        )}
+
         {availableSlots.length === 0 && (
           <p className="border border-black px-4 py-6 text-center text-sm text-neutral-700">
             今天已無可預約時段。
@@ -101,13 +131,28 @@ function WalkInBooking({ currentUser }) {
           {availableSlots.map((slot) => (
             <Button
               key={slot}
-              variant="outline"
-              onClick={() => handleWalkInBooking(slot)}
+              variant={selectedSlot === slot ? "primary" : "outline"}
+              onClick={() => {
+                if (existingBooking) return;
+                setSelectedSlot(slot);
+                setFeedback("");
+              }}
+              disabled={Boolean(existingBooking)}
               className="w-full font-mono text-sm"
             >
               {slot}
             </Button>
           ))}
+        </div>
+
+        <div className="border-t border-black pt-4">
+          <Button
+            onClick={handleWalkInBooking}
+            disabled={!selectedSlot || Boolean(existingBooking)}
+            className="w-full md:w-auto md:min-w-[240px]"
+          >
+            確認現場預約
+          </Button>
         </div>
       </Card>
     </section>

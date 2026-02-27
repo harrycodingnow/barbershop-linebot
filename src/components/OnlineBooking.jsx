@@ -72,16 +72,16 @@ function OnlineBooking({ currentUser }) {
       </header>
 
       <Card className="editorial-grid space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black pb-4">
+        <div className="flex flex-col items-center gap-3 border-b border-black pb-4 text-center md:flex-row md:justify-between md:text-left">
           <p className="text-lg">選擇預約日期</p>
           <Badge variant="muted">Today Locked</Badge>
         </div>
 
-        <p className="text-sm text-neutral-700">
+        <p className="text-center text-sm text-neutral-700 md:text-left">
           今天（{formatDateLabel(today)}）不可線上預約，請選擇明天以後日期。
         </p>
 
-        <label className="block text-xs font-mono uppercase tracking-[0.12em] text-neutral-600">
+        <label className="block text-center text-xs font-mono uppercase tracking-[0.12em] text-neutral-600 md:text-left">
           Booking Date
         </label>
         <input
@@ -92,7 +92,7 @@ function OnlineBooking({ currentUser }) {
             setSelectedDate(event.target.value);
             setSelectedSlot("");
           }}
-          className="w-full border-2 border-black bg-white px-3 py-3 font-mono text-sm focus:border-[3px] focus:outline-none"
+          className="mx-auto block w-full max-w-sm border-2 border-black bg-white px-3 py-3 text-center font-mono text-sm focus:border-[3px] focus:outline-none md:mx-0 md:text-left"
         />
       </Card>
 
