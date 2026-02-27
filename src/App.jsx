@@ -19,8 +19,7 @@ const getViewFromURL = () => {
 
 const NAV_ITEMS = [
   { key: "walk-in", label: "現場預約" },
-  { key: "online", label: "線上預約" },
-  { key: "admin", label: "老闆後台" }
+  { key: "online", label: "線上預約" }
 ];
 
 function App() {
