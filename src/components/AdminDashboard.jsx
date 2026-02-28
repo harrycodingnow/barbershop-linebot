@@ -204,35 +204,52 @@ function AdminDashboard() {
             />
           </Card>
 
-          <Card className="space-y-3">
-            <p className="font-mono text-xs uppercase tracking-[0.12em] text-neutral-600">
-              Summary / {selectedDateLabel}
+          <Card className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black pb-3">
+              <p className="font-mono text-xs uppercase tracking-[0.12em] text-neutral-700">
+                Daily Summary
+              </p>
+              <Badge>{selectedDateLabel}</Badge>
+            </div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-neutral-600">
+              Focus: 待到店
             </p>
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              <div className="border border-black p-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
-                  總數
-                </p>
-                <p className="mt-1 text-2xl md:text-3xl">{scheduleSummary.total}</p>
-              </div>
-              <div className="border border-black p-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+
+            <div className="grid grid-cols-1 border border-black md:grid-cols-12">
+              <section className="border-b border-black bg-black p-4 text-white md:col-span-6 md:border-b-0 md:border-r">
+                <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/80">
                   待到店
                 </p>
-                <p className="mt-1 text-2xl md:text-3xl">{scheduleSummary.pending}</p>
-              </div>
-              <div className="border border-black p-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
-                  已到
+                <p className="mt-2 text-5xl leading-none md:text-6xl">
+                  {scheduleSummary.pending}
                 </p>
-                <p className="mt-1 text-2xl md:text-3xl">{scheduleSummary.completed}</p>
-              </div>
-              <div className="border border-black p-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
-                  未到
+                <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-white/70">
+                  需要處理
                 </p>
-                <p className="mt-1 text-2xl md:text-3xl">{scheduleSummary.noShow}</p>
-              </div>
+              </section>
+
+              <section className="md:col-span-6">
+                <div className="grid grid-cols-1 md:grid-cols-3">
+                  <div className="border-b border-black p-4 md:border-b-0 md:border-r">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+                      總數
+                    </p>
+                    <p className="mt-2 text-3xl leading-none">{scheduleSummary.total}</p>
+                  </div>
+                  <div className="border-b border-black p-4 md:border-b-0 md:border-r">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+                      已到
+                    </p>
+                    <p className="mt-2 text-3xl leading-none">{scheduleSummary.completed}</p>
+                  </div>
+                  <div className="p-4">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+                      未到
+                    </p>
+                    <p className="mt-2 text-3xl leading-none">{scheduleSummary.noShow}</p>
+                  </div>
+                </div>
+              </section>
             </div>
           </Card>
 
