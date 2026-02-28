@@ -43,122 +43,125 @@ export default function CustomerView() {
     };
 
     return (
-        <div className="flex justify-center mt-4">
-            {/* Mock Mobile Phone Container */}
-            <div className="w-[375px] h-[750px] bg-gray-100 rounded-[3rem] p-4 shadow-2xl relative border-[12px] border-neutral-900 overflow-hidden flex flex-col">
+        <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-500">
 
-                {/* Notch mock */}
-                <div className="absolute top-0 inset-x-0 h-6 bg-neutral-900 rounded-b-3xl w-1/2 mx-auto z-10"></div>
-
-                {/* LINE Chat Header */}
-                <div className="bg-[#00B900] -mx-4 -mt-4 pt-10 pb-3 px-4 flex items-center shadow-sm z-0 relative">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3 text-white">
-                        {'<'}
+            {/* Debug / Mock Input Panel */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-200">
+                <h2 className="font-bold text-xl text-neutral-800 mb-4 flex items-center">
+                    <span className="bg-neutral-100 p-2 rounded-lg mr-3">🔧</span>
+                    目前使用者身分
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-neutral-600 block">User ID</label>
+                        <input
+                            type="text"
+                            value={lineUserId}
+                            onChange={(e) => setLineUserId(e.target.value)}
+                            className="font-mono bg-neutral-50 px-3 py-2 w-full border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
                     </div>
-                    <span className="text-white font-bold flex-1 text-center pr-8 shadow-sm">
-                        快理我 barbershop
-                    </span>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-neutral-600 block">顯示名稱</label>
+                        <input
+                            type="text"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            className="bg-neutral-50 px-3 py-2 w-full border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                    </div>
                 </div>
+                <div className="mt-4 flex justify-end">
+                    <Button
+                        onClick={generateRandomUser}
+                        variant="outline"
+                        className="text-sm"
+                    >
+                        🔄 隨機產生
+                    </Button>
+                </div>
+            </div>
 
-                {/* Chat Body */}
-                <div className="flex-1 bg-[#859BA4] overflow-y-auto px-3 py-4 flex flex-col gap-4">
+            {/* Main Action Area */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-200 space-y-6">
 
-                    {/* Debug / Mock Input Panel */}
-                    <div className="bg-white/90 p-3 rounded-lg text-xs shadow-sm mb-2">
-                        <p className="font-bold text-gray-700 mb-2 border-b pb-1">🔧 模擬器設定</p>
-                        <div className="flex gap-2 items-center mb-2">
-                            <label className="w-10">ID:</label>
-                            <input
-                                type="text"
-                                value={lineUserId}
-                                onChange={(e) => setLineUserId(e.target.value)}
-                                className="font-mono bg-gray-100 px-2 py-1 flex-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div className="flex gap-2 items-center mb-2">
-                            <label className="w-10">Name:</label>
-                            <input
-                                type="text"
-                                value={displayName}
-                                onChange={(e) => setDisplayName(e.target.value)}
-                                className="bg-gray-100 px-2 py-1 flex-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <button
-                            onClick={generateRandomUser}
-                            className="w-full bg-blue-100 text-blue-700 py-1 rounded hover:bg-blue-200"
+                {!status?.active ? (
+                    <div className="text-center py-8">
+                        <h3 className="text-2xl font-bold mb-2">歡迎光臨</h3>
+                        <p className="text-neutral-500 mb-8 max-w-sm mx-auto">
+                            點擊下方按鈕抽取您的現場專屬號碼牌
+                        </p>
+                        <Button
+                            onClick={handleCreateTicket}
+                            size="lg"
+                            className="w-full md:w-auto md:px-12 py-4 text-lg bg-black text-white hover:bg-neutral-800 transition-all hover:scale-105"
                         >
-                            🔄 切換隨機身份
-                        </button>
+                            👉 抽取號碼牌
+                        </Button>
                     </div>
+                ) : (
+                    <div className="space-y-8 animate-in slide-in-from-bottom-4">
+                        <div className="text-center">
+                            <h3 className="font-bold text-xl mb-6 text-neutral-600">您的候位進度</h3>
 
-                    {/* User actions (LIFF/Rich Menu buttons mock) */}
-                    <div className="grid grid-cols-2 gap-2 mt-auto">
-                        {!status?.active ? (
-                            <button
-                                onClick={handleCreateTicket}
-                                className="col-span-2 bg-[#00B900] text-white py-3 rounded-xl font-bold shadow hover:bg-green-600 transition"
-                            >
-                                👉 點我抽號碼牌
-                            </button>
-                        ) : (
-                            <>
-                                <button
-                                    onClick={refreshStatus}
-                                    className="bg-blue-500 text-white py-2 rounded-xl font-bold shadow hover:bg-blue-600 transition"
-                                >
-                                    🔄 重新整理進度
-                                </button>
-                                <button
-                                    onClick={handleCancelTicket}
-                                    className="bg-gray-400 text-white py-2 rounded-xl font-bold shadow hover:bg-gray-500 transition"
-                                >
-                                    ❌ 取消候位
-                                </button>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Flex Message Display (If Active) */}
-                    {status?.active && (
-                        <div className="bg-white rounded-xl shadow p-5 border-t-8 border-[#00B900] animate-in fade-in slide-in-from-bottom-2">
-                            <h3 className="font-bold text-lg mb-4 text-center">現場候位進度</h3>
-
-                            <div className="text-center mb-6">
-                                <p className="text-gray-500 text-sm">您的號碼</p>
-                                <p className="text-5xl font-black text-black my-1">
-                                    #{status.ticket.ticketNumber}
-                                </p>
-                                <p className="text-sm">
-                                    <span className={`px-2 py-0.5 rounded-full text-xs ${status.ticket.status === 'called' ? 'bg-orange-100 text-orange-700 font-bold' : 'bg-green-100 text-green-700'
-                                        }`}>
-                                        {status.ticket.status === 'called' ? '📢 已到號，請前往' : '⌛ 等待中'}
-                                    </span>
-                                </p>
-                            </div>
-
-                            <div className="space-y-3 border-t pt-4 text-sm">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-500">目前叫號</span>
-                                    <span className="font-bold text-lg">#{status.currentCalledNumber}</span>
-                                </div>
-                                {status.ticket.status === 'waiting' && (
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-500">前方等待人數</span>
-                                        <span className="font-bold text-red-500 text-lg">{status.peopleAhead} 人</span>
+                            <div className="inline-block px-12 py-8 bg-neutral-50 rounded-3xl border border-neutral-200 mb-6 group relative overflow-hidden">
+                                <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="relative z-10">
+                                    <p className="text-neutral-500 text-sm font-medium mb-1 tracking-widest uppercase">號碼牌</p>
+                                    <p className="text-7xl font-black text-blue-600 my-2 tracking-tighter">
+                                        #{status.ticket.ticketNumber}
+                                    </p>
+                                    <div className="mt-4">
+                                        <span className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-sm ${status.ticket.status === 'called'
+                                                ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-200 animate-pulse'
+                                                : 'bg-green-100 text-green-700 ring-1 ring-green-200'
+                                            }`}>
+                                            {status.ticket.status === 'called' ? '📢 已到號，請前往店內' : '⌛ 現場等待中'}
+                                        </span>
                                     </div>
-                                )}
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-500">取號時間</span>
-                                    <span className="text-gray-700">
-                                        {new Date(status.ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
                                 </div>
                             </div>
-
                         </div>
-                    )}
-                </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-neutral-100 pt-6">
+                            <div className="bg-neutral-50 p-4 rounded-xl text-center">
+                                <span className="block text-neutral-500 text-sm mb-1">目前叫號</span>
+                                <span className="font-bold text-2xl text-neutral-800">#{status.currentCalledNumber}</span>
+                            </div>
+
+                            {status.ticket.status === 'waiting' && (
+                                <div className="bg-red-50 p-4 rounded-xl text-center border border-red-100">
+                                    <span className="block text-red-600 text-sm mb-1 font-medium">前方等待</span>
+                                    <span className="font-bold text-2xl text-red-600">{status.peopleAhead} <span className="text-sm font-normal">人</span></span>
+                                </div>
+                            )}
+
+                            <div className="bg-neutral-50 p-4 rounded-xl text-center">
+                                <span className="block text-neutral-500 text-sm mb-1">抽號時間</span>
+                                <span className="font-bold text-lg text-neutral-700">
+                                    {new Date(status.ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4 pt-4">
+                            <Button
+                                onClick={refreshStatus}
+                                variant="outline"
+                                className="flex-1"
+                            >
+                                🔄 重新整理
+                            </Button>
+                            <Button
+                                onClick={handleCancelTicket}
+                                variant="outline"
+                                className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                            >
+                                ❌ 取消候位
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
