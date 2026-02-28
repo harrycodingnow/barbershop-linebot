@@ -62,22 +62,6 @@ function App() {
                 <span className="block">現場候位系統</span>
               </h1>
             </div>
-
-            <nav className="flex flex-wrap gap-2" aria-label="Views">
-              {NAV_ITEMS.map((item) => {
-                const isActive = view === item.key;
-                return (
-                  <Button
-                    key={item.key}
-                    onClick={() => navigateToView(item.key)}
-                    variant={isActive ? "primary" : "outline"}
-                    className="min-w-[140px] text-sm py-2 px-4 shadow-sm"
-                  >
-                    {item.label}
-                  </Button>
-                );
-              })}
-            </nav>
           </div>
         </header>
 
