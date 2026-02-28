@@ -45,43 +45,6 @@ export default function CustomerView() {
     return (
         <div className="max-w-xl mx-auto space-y-12 animate-in fade-in duration-700 py-8 relative z-10">
 
-            {/* Debug / Mock Input Panel (Keep simple but themed) */}
-            <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl shadow-soft border border-stone">
-                <h2 className="font-sans font-semibold text-lg text-forest mb-4 flex items-center">
-                    <span className="text-sage mr-3">🔧</span>
-                    模擬設定
-                </h2>
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                        <label className="text-sm text-sage font-medium block">User ID</label>
-                        <input
-                            type="text"
-                            value={lineUserId}
-                            onChange={(e) => setLineUserId(e.target.value)}
-                            className="font-mono bg-alabaster px-4 py-2 w-full border border-stone rounded-full focus:ring-2 focus:ring-sage focus:border-sage transition-all"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm text-sage font-medium block">顯示名稱</label>
-                        <input
-                            type="text"
-                            value={displayName}
-                            onChange={(e) => setDisplayName(e.target.value)}
-                            className="bg-alabaster px-4 py-2 w-full border border-stone rounded-full focus:ring-2 focus:ring-sage focus:border-sage transition-all"
-                        />
-                    </div>
-                </div>
-                <div className="mt-5 flex justify-end">
-                    <Button
-                        onClick={generateRandomUser}
-                        variant="outline"
-                        className="text-xs px-6 py-2"
-                    >
-                        🔄 隨機產生
-                    </Button>
-                </div>
-            </div>
-
             {/* Main Action Area */}
             <div className="bg-white p-8 md:p-12 rounded-[40px] shadow-soft-md border border-stone space-y-6">
 
@@ -136,7 +99,10 @@ export default function CustomerView() {
                             {status.ticket.status === 'waiting' ? (
                                 <div className="flex flex-col items-center justify-center p-4 bg-alabaster rounded-3xl border border-stone">
                                     <span className="text-terracotta text-xs uppercase tracking-widest mb-2 font-semibold">前方等待</span>
-                                    <span className="font-display text-4xl text-terracotta">{status.peopleAhead} <span className="text-sm font-sans italic text-sage ml-1">人</span></span>
+                                    <span className="font-display text-4xl text-terracotta mb-2">{status.peopleAhead} <span className="text-sm font-sans italic text-sage ml-1">人</span></span>
+                                    <span className="text-[10px] text-sage w-full text-center tracking-widest uppercase bg-stone/50 py-1.5 rounded-full mt-2 font-semibold">
+                                        預估等候 {status.peopleAhead * 15} 分鐘
+                                    </span>
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center p-4">
@@ -170,6 +136,43 @@ export default function CustomerView() {
                         </div>
                     </div>
                 )}
+            </div>
+
+            {/* Debug / Mock Input Panel (Keep simple but themed) */}
+            <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl shadow-soft border border-stone">
+                <h2 className="font-sans font-semibold text-lg text-forest mb-4 flex items-center">
+                    <span className="text-sage mr-3">🔧</span>
+                    模擬設定
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <label className="text-sm text-sage font-medium block">User ID</label>
+                        <input
+                            type="text"
+                            value={lineUserId}
+                            onChange={(e) => setLineUserId(e.target.value)}
+                            className="font-mono bg-alabaster px-4 py-2 w-full border border-stone rounded-full focus:ring-2 focus:ring-sage focus:border-sage transition-all"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm text-sage font-medium block">顯示名稱</label>
+                        <input
+                            type="text"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            className="bg-alabaster px-4 py-2 w-full border border-stone rounded-full focus:ring-2 focus:ring-sage focus:border-sage transition-all"
+                        />
+                    </div>
+                </div>
+                <div className="mt-5 flex justify-end">
+                    <Button
+                        onClick={generateRandomUser}
+                        variant="outline"
+                        className="text-xs px-6 py-2"
+                    >
+                        🔄 隨機產生
+                    </Button>
+                </div>
             </div>
         </div>
     );
