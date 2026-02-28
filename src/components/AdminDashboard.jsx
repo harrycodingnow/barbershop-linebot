@@ -223,15 +223,17 @@ function AdminDashboard() {
             <label className="font-mono text-xs uppercase tracking-[0.1em] text-neutral-600">
               Date Picker
             </label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(event) => {
-                setSelectedDate(event.target.value);
-                setDevMessage("");
-              }}
-              className="w-full border-2 border-black bg-white px-3 py-3 font-mono text-sm focus:border-[3px] focus:outline-none md:max-w-[280px]"
-            />
+            <div className="flex justify-center">
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(event) => {
+                  setSelectedDate(event.target.value);
+                  setDevMessage("");
+                }}
+                className="w-[14.5rem] max-w-full border-2 border-black bg-white px-3 py-3 text-center font-mono text-sm focus:border-[3px] focus:outline-none"
+              />
+            </div>
           </Card>
 
           <Card className="space-y-3 !p-4 md:space-y-4 md:!p-6">
