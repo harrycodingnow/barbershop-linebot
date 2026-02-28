@@ -49,17 +49,17 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-8 md:px-8 lg:px-12 bg-neutral-50">
-      <section className="mx-auto w-full max-w-6xl">
-        <header className="space-y-6 border-b-4 border-black pb-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-3">
-              <p className="font-mono text-xs uppercase tracking-[0.14em] text-neutral-500">
+    <main className="min-h-screen px-4 py-8 md:px-8 lg:px-12 bg-alabaster relative">
+      <section className="mx-auto w-full max-w-7xl relative z-10">
+        <header className="space-y-6 border-b border-stone pb-8 pt-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4">
+              <p className="font-sans text-xs uppercase tracking-[0.2em] text-sage font-medium">
                 Live Queueing MVP
               </p>
-              <h1 className="font-display text-4xl tracking-tight md:text-5xl lg:text-6xl text-black">
-                <span className="block">快理我</span>
-                <span className="block">現場候位系統</span>
+              <h1 className="font-display text-5xl tracking-tight md:text-6xl lg:text-7xl text-forest">
+                <span className="block italic pr-4">Salon</span>
+                <span className="block font-semibold mt-2">快理我</span>
               </h1>
             </div>
           </div>
