@@ -179,6 +179,40 @@ export const strikeUserForBooking = (
   return target;
 };
 
+export const updateUserNotes = (lineUserId, notes = "") => {
+  const data = readSalonData();
+  const existingUser = data.users[lineUserId] ?? {
+    displayName: "未知客人",
+    isBlacklisted: false,
+    notes: ""
+  };
+
+  data.users[lineUserId] = {
+    ...existingUser,
+    notes: String(notes ?? "")
+  };
+
+  saveSalonData(data);
+  return data.users[lineUserId];
+};
+
+export const setUserBlacklist = (lineUserId, isBlacklisted) => {
+  const data = readSalonData();
+  const existingUser = data.users[lineUserId] ?? {
+    displayName: "未知客人",
+    isBlacklisted: false,
+    notes: ""
+  };
+
+  data.users[lineUserId] = {
+    ...existingUser,
+    isBlacklisted: Boolean(isBlacklisted)
+  };
+
+  saveSalonData(data);
+  return data.users[lineUserId];
+};
+
 export const isUserBlacklisted = (lineUserId) =>
   Boolean(readSalonData().users?.[lineUserId]?.isBlacklisted);
 

@@ -78,9 +78,6 @@ function App() {
                 專為理髮店展示流程的預約系統。所有狀態與紀錄都儲存在瀏覽器本機。
               </p>
             </div>
-            <div className="border-2 border-black px-4 py-3 font-mono text-xs uppercase tracking-[0.12em]">
-              Demo User: {CURRENT_USER.displayName} / {CURRENT_USER.lineUserId}
-            </div>
           </div>
 
           {activeView !== "admin" && (
