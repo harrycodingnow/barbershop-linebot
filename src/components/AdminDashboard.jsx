@@ -29,11 +29,26 @@ const ADMIN_TABS = [
   { key: "blacklist", label: "黑名單" }
 ];
 
+const SCHEDULE_START_HOUR = 12;
+const SCHEDULE_END_HOUR = 21;
+
 const getLatestBookingDate = (bookings) =>
   bookings.reduce(
     (latestDate, booking) => (booking.date > latestDate ? booking.date : latestDate),
     ""
   );
+
+const getHourFromTimeSlot = (timeSlot) => {
+  const hour = Number(String(timeSlot || "").split(":")[0]);
+  return Number.isNaN(hour) ? null : hour;
+};
+
+const formatHourLabel = (hour24) => {
+  if (hour24 === 12) return "下午12點";
+  if (hour24 > 12) return `下午${hour24 - 12}點`;
+  if (hour24 === 0) return "上午12點";
+  return `上午${hour24}點`;
+};
 
 function AdminDashboard() {
   const today = useMemo(() => getTodayDateString(), []);
@@ -112,6 +127,27 @@ function AdminDashboard() {
     () => allBookings.filter((booking) => booking.date === selectedDate),
     [allBookings, selectedDate]
   );
+
+  const scheduleHours = useMemo(
+    () =>
+      Array.from(
+        { length: SCHEDULE_END_HOUR - SCHEDULE_START_HOUR + 1 },
+        (_, index) => SCHEDULE_START_HOUR + index
+      ),
+    []
+  );
+
+  const bookingsByHour = useMemo(() => {
+    return selectedDateBookings.reduce((acc, booking) => {
+      const hour = getHourFromTimeSlot(booking.timeSlot);
+      if (hour === null) return acc;
+      if (hour < SCHEDULE_START_HOUR || hour > SCHEDULE_END_HOUR) return acc;
+
+      if (!acc[hour]) acc[hour] = [];
+      acc[hour].push(booking);
+      return acc;
+    }, {});
+  }, [selectedDateBookings]);
 
   const scheduleSummary = useMemo(() => {
     const summary = {
@@ -204,7 +240,7 @@ function AdminDashboard() {
             />
           </Card>
 
-          <Card className="space-y-4">
+          <Card className="space-y-3 !p-4 md:space-y-4 md:!p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black pb-3">
               <p className="font-mono text-xs uppercase tracking-[0.12em] text-neutral-700">
                 Daily Summary
@@ -216,37 +252,43 @@ function AdminDashboard() {
             </p>
 
             <div className="grid grid-cols-1 border border-black md:grid-cols-12">
-              <section className="border-b border-black bg-black p-4 text-white md:col-span-6 md:border-b-0 md:border-r">
+              <section className="border-b border-black bg-black p-3 text-white md:col-span-6 md:border-b-0 md:border-r md:p-4">
                 <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/80">
                   待到店
                 </p>
-                <p className="mt-2 text-5xl leading-none md:text-6xl">
+                <p className="mt-1 text-3xl leading-none md:mt-2 md:text-6xl">
                   {scheduleSummary.pending}
                 </p>
-                <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-white/70">
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.08em] text-white/70 md:mt-3 md:text-[11px]">
                   需要處理
                 </p>
               </section>
 
               <section className="md:col-span-6">
                 <div className="grid grid-cols-1 md:grid-cols-3">
-                  <div className="border-b border-black p-4 md:border-b-0 md:border-r">
+                  <div className="border-b border-black p-3 md:border-b-0 md:border-r md:p-4">
                     <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
                       總數
                     </p>
-                    <p className="mt-2 text-3xl leading-none">{scheduleSummary.total}</p>
+                    <p className="mt-1 text-2xl leading-none md:mt-2 md:text-3xl">
+                      {scheduleSummary.total}
+                    </p>
                   </div>
-                  <div className="border-b border-black p-4 md:border-b-0 md:border-r">
+                  <div className="border-b border-black p-3 md:border-b-0 md:border-r md:p-4">
                     <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
                       已到
                     </p>
-                    <p className="mt-2 text-3xl leading-none">{scheduleSummary.completed}</p>
+                    <p className="mt-1 text-2xl leading-none md:mt-2 md:text-3xl">
+                      {scheduleSummary.completed}
+                    </p>
                   </div>
-                  <div className="p-4">
+                  <div className="p-3 md:p-4">
                     <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
                       未到
                     </p>
-                    <p className="mt-2 text-3xl leading-none">{scheduleSummary.noShow}</p>
+                    <p className="mt-1 text-2xl leading-none md:mt-2 md:text-3xl">
+                      {scheduleSummary.noShow}
+                    </p>
                   </div>
                 </div>
               </section>
@@ -259,105 +301,114 @@ function AdminDashboard() {
               <Badge>{selectedDateBookings.length} 筆</Badge>
             </div>
 
-            {selectedDateBookings.length === 0 ? (
-              <p className="border border-black px-4 py-6 text-center text-sm text-neutral-700">
-                此日期尚無預約。
-              </p>
-            ) : (
-              <div className="overflow-x-auto border border-black">
-                <table className="min-w-[980px] w-full border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-neutral-100">
-                      <th className="border-b border-r border-black px-3 py-2 text-left font-mono text-[11px] uppercase tracking-[0.08em]">
-                        時段
-                      </th>
-                      <th className="border-b border-r border-black px-3 py-2 text-left font-mono text-[11px] uppercase tracking-[0.08em]">
-                        客人
-                      </th>
-                      <th className="border-b border-r border-black px-3 py-2 text-left font-mono text-[11px] uppercase tracking-[0.08em]">
-                        狀態
-                      </th>
-                      <th className="border-b border-r border-black px-3 py-2 text-left font-mono text-[11px] uppercase tracking-[0.08em]">
-                        預約類型
-                      </th>
-                      <th className="border-b border-r border-black px-3 py-2 text-left font-mono text-[11px] uppercase tracking-[0.08em]">
-                        訂金
-                      </th>
-                      <th className="border-b border-black px-3 py-2 text-left font-mono text-[11px] uppercase tracking-[0.08em]">
-                        操作
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedDateBookings.map((booking) => {
-                      const user = users[booking.lineUserId];
-                      const isPending = booking.status === "booked";
-                      const isBlacklisted = Boolean(user?.isBlacklisted);
+            <div className="border border-black">
+              {scheduleHours.map((hour) => {
+                const rowBookings = bookingsByHour[hour] ?? [];
+                return (
+                  <section
+                    key={hour}
+                    className="grid min-h-[76px] grid-cols-[5.5rem_1fr] border-b border-black last:border-b-0"
+                  >
+                    <div className="border-r border-black px-2 py-3 font-mono text-xs tracking-[0.06em] text-neutral-700">
+                      {formatHourLabel(hour)}
+                    </div>
 
-                      return (
-                        <tr key={booking.id}>
-                          <td className="border-b border-r border-black px-3 py-2 align-top font-mono">
-                            {booking.timeSlot}
-                          </td>
-                          <td className="border-b border-r border-black px-3 py-2 align-top">
-                            <p className="font-medium">{booking.displayName || "未知客人"}</p>
-                            <p className="mt-1 font-mono text-[11px] tracking-[0.06em] text-neutral-600">
-                              {booking.lineUserId}
-                            </p>
-                            {user?.notes && (
-                              <p className="mt-2 border border-neutral-300 px-2 py-1 whitespace-pre-line font-mono text-[11px] text-neutral-600">
-                                NOTES: {user.notes}
-                              </p>
-                            )}
-                          </td>
-                          <td className="border-b border-r border-black px-3 py-2 align-top">
-                            <div className="flex flex-col items-start gap-1">
-                              <Badge variant={statusVariantMap[booking.status]}>
-                                {statusLabelMap[booking.status] || booking.status}
-                              </Badge>
-                              {isBlacklisted && (
-                                <Badge variant="muted" className="w-fit">
-                                  黑名單
-                                </Badge>
-                              )}
-                            </div>
-                          </td>
-                          <td className="border-b border-r border-black px-3 py-2 align-top">
-                            <Badge variant={booking.type === "online" ? "inverted" : "default"}>
-                              {booking.type === "walk-in" ? "現場預約" : "線上預約"}
-                            </Badge>
-                          </td>
-                          <td className="border-b border-r border-black px-3 py-2 align-top">
-                            <Badge variant={booking.isDepositPaid ? "inverted" : "muted"}>
-                              {booking.isDepositPaid ? "已付訂金" : "未付訂金"}
-                            </Badge>
-                          </td>
-                          <td className="border-b border-black px-3 py-2 align-top">
-                            <div className="flex min-w-[170px] flex-col gap-2">
-                              <Button
-                                disabled={!isPending}
-                                onClick={() => handleCheckIn(booking.id)}
-                                className="min-h-9 px-3 py-2 text-[11px] tracking-[0.08em]"
+                    <div className="px-2 py-2 md:px-3">
+                      {rowBookings.length === 0 ? (
+                        <div className="h-full min-h-[56px]" />
+                      ) : (
+                        <div className="space-y-2">
+                          {rowBookings.map((booking) => {
+                            const user = users[booking.lineUserId];
+                            const isPending = booking.status === "booked";
+                            const isBlacklisted = Boolean(user?.isBlacklisted);
+                            const isBooked = booking.status === "booked";
+
+                            return (
+                              <article
+                                key={booking.id}
+                                className={`border-2 border-black p-3 ${
+                                  isBooked ? "bg-black text-white" : "bg-white text-black"
+                                }`}
                               >
-                                已到 Check In
-                              </Button>
-                              <Button
-                                variant="outline"
-                                disabled={!isPending}
-                                onClick={() => handleStrike(booking.id)}
-                                className="min-h-9 px-3 py-2 text-[11px] tracking-[0.08em]"
-                              >
-                                未到 / 黑名單
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                                  <div className="space-y-2">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <p className="font-mono text-sm">{booking.timeSlot}</p>
+                                      <p className="text-sm">{booking.displayName || "未知客人"}</p>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <Badge variant={statusVariantMap[booking.status]}>
+                                        {statusLabelMap[booking.status] || booking.status}
+                                      </Badge>
+                                      <Badge
+                                        variant={booking.type === "online" ? "inverted" : "default"}
+                                      >
+                                        {booking.type === "walk-in" ? "現場預約" : "線上預約"}
+                                      </Badge>
+                                      <Badge
+                                        variant={booking.isDepositPaid ? "inverted" : "muted"}
+                                      >
+                                        {booking.isDepositPaid ? "已付訂金" : "未付訂金"}
+                                      </Badge>
+                                      {isBlacklisted && (
+                                        <Badge variant="muted" className="w-fit">
+                                          黑名單
+                                        </Badge>
+                                      )}
+                                    </div>
+
+                                    {user?.notes && (
+                                      <p
+                                        className={`border px-2 py-1 whitespace-pre-line font-mono text-[11px] ${
+                                          isBooked
+                                            ? "border-white/70 text-white/85"
+                                            : "border-neutral-300 text-neutral-700"
+                                        }`}
+                                      >
+                                        NOTES: {user.notes}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <div className="flex gap-2 md:flex-col">
+                                    <Button
+                                      variant="outline"
+                                      disabled={!isPending}
+                                      onClick={() => handleCheckIn(booking.id)}
+                                      className={`min-h-8 px-3 py-2 text-[10px] tracking-[0.08em] ${
+                                        isBooked
+                                          ? "border-white bg-white text-black hover:bg-neutral-100 hover:text-black"
+                                          : ""
+                                      }`}
+                                    >
+                                      已到
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      disabled={!isPending}
+                                      onClick={() => handleStrike(booking.id)}
+                                      className={`min-h-8 px-3 py-2 text-[10px] tracking-[0.08em] ${
+                                        isBooked
+                                          ? "border-white bg-white text-black hover:bg-neutral-100 hover:text-black"
+                                          : ""
+                                      }`}
+                                    >
+                                      未到
+                                    </Button>
+                                  </div>
+                                </div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
           </Card>
         </section>
       )}
