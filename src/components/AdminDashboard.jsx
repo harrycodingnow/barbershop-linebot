@@ -12,12 +12,6 @@ import Badge from "./ui/Badge";
 import Button from "./ui/Button";
 import Card from "./ui/Card";
 
-const statusVariantMap = {
-  booked: "default",
-  completed: "inverted",
-  noshow: "muted"
-};
-
 const statusLabelMap = {
   booked: "待到店",
   completed: "已到",
@@ -313,6 +307,11 @@ function AdminDashboard() {
                             const depositLabel = booking.isDepositPaid
                               ? "已付訂金"
                               : "未付訂金";
+                            const statusLabel =
+                              statusLabelMap[booking.status] || booking.status;
+                            const metaText = `${statusLabel} · ${bookingTypeLabel} · ${depositLabel}${
+                              isBlacklisted ? " · 黑名單" : ""
+                            }`;
 
                             return (
                               <article
@@ -340,36 +339,13 @@ function AdminDashboard() {
                                       LINE ID: {booking.lineUserId}
                                     </p>
 
-                                    <div className="flex flex-wrap items-center gap-1.5">
-                                      <Badge
-                                        variant={statusVariantMap[booking.status]}
-                                        className="px-1.5 py-0.5 text-[10px] tracking-[0.08em]"
-                                      >
-                                        {statusLabelMap[booking.status] || booking.status}
-                                      </Badge>
-                                      <Badge
-                                        className={`px-1.5 py-0.5 text-[10px] tracking-[0.08em] ${
-                                          isBooked ? "border-white bg-transparent text-white" : ""
-                                        }`}
-                                      >
-                                        {bookingTypeLabel}
-                                      </Badge>
-                                      <Badge
-                                        className={`px-1.5 py-0.5 text-[10px] tracking-[0.08em] ${
-                                          isBooked ? "border-white bg-transparent text-white" : ""
-                                        }`}
-                                      >
-                                        {depositLabel}
-                                      </Badge>
-                                      {isBlacklisted && (
-                                        <Badge
-                                          variant="muted"
-                                          className="w-fit px-1.5 py-0.5 text-[10px] tracking-[0.08em]"
-                                        >
-                                          黑名單
-                                        </Badge>
-                                      )}
-                                    </div>
+                                    <p
+                                      className={`font-mono text-[11px] tracking-[0.08em] ${
+                                        isBooked ? "text-white/85" : "text-neutral-700"
+                                      }`}
+                                    >
+                                      {metaText}
+                                    </p>
 
                                     {user?.notes && (
                                       <p
@@ -389,7 +365,7 @@ function AdminDashboard() {
                                       variant="outline"
                                       disabled={!isPending}
                                       onClick={() => handleCheckIn(booking.id)}
-                                      className={`min-h-8 whitespace-nowrap px-3 py-1 text-[10px] tracking-[0.08em] ${
+                                      className={`!min-h-8 whitespace-nowrap !px-3 !py-1 !text-[10px] !tracking-[0.04em] ${
                                         isBooked
                                           ? "border-white bg-white text-black hover:bg-neutral-100 hover:text-black"
                                           : ""
@@ -401,7 +377,7 @@ function AdminDashboard() {
                                       variant="outline"
                                       disabled={!isPending}
                                       onClick={() => handleStrike(booking.id)}
-                                      className={`min-h-8 whitespace-nowrap px-3 py-1 text-[10px] tracking-[0.08em] ${
+                                      className={`!min-h-8 whitespace-nowrap !px-3 !py-1 !text-[10px] !tracking-[0.04em] ${
                                         isBooked
                                           ? "border-white bg-white text-black hover:bg-neutral-100 hover:text-black"
                                           : ""
