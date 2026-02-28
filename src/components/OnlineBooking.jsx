@@ -148,7 +148,7 @@ function OnlineBooking({ currentUser }) {
             <p className="mt-4 text-sm text-neutral-700">
               訂單：{formatDateLabel(selectedDate)} {selectedSlot}
             </p>
-            <p className="mt-1 text-sm text-neutral-700">訂金：NT$300（Demo 模擬）</p>
+            <p className="mt-1 text-sm text-neutral-700">訂金：NT$100（Demo 模擬）</p>
 
             <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
               <Button
