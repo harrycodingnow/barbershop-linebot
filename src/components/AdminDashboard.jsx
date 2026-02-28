@@ -195,7 +195,7 @@ function AdminDashboard() {
             {ADMIN_TABS.map((tab) => (
               <Button
                 key={tab.key}
-                variant={activeTab === tab.key ? "primary" : "outline"}
+                variant={activeTab === tab.key ? "selected" : "outline"}
                 onClick={() => {
                   setActiveTab(tab.key);
                   setDevMessage("");
@@ -247,35 +247,36 @@ function AdminDashboard() {
               </p>
               <Badge>{selectedDateLabel}</Badge>
             </div>
-            <div className="border border-black">
-              <div className="flex flex-wrap items-center gap-4 border-b border-black px-3 py-2 font-mono text-sm">
-                <p>
-                  待到店:
-                  <span className="ml-2 inline-block min-w-6 text-lg font-semibold leading-none">
-                    {scheduleSummary.pending}
-                  </span>
+            <div className="grid grid-cols-2 gap-px border border-black bg-black md:grid-cols-4">
+              <section className="bg-black px-3 py-3 text-white">
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-white/80">
+                  待到店
                 </p>
-                <p>
-                  總數:
-                  <span className="ml-2 inline-block min-w-6 text-lg font-semibold leading-none">
-                    {scheduleSummary.total}
-                  </span>
+                <p className="mt-1 text-3xl leading-none md:text-4xl">{scheduleSummary.pending}</p>
+              </section>
+
+              <section className="bg-white px-3 py-3 text-black">
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+                  總數
                 </p>
-              </div>
-              <div className="grid grid-cols-2 gap-3 px-3 py-2 font-mono text-sm">
-                <p>
-                  已到:
-                  <span className="ml-2 inline-block min-w-6 text-base font-semibold leading-none">
-                    {scheduleSummary.completed}
-                  </span>
+                <p className="mt-1 text-2xl leading-none md:text-3xl">{scheduleSummary.total}</p>
+              </section>
+
+              <section className="bg-white px-3 py-3 text-black">
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+                  已到
                 </p>
-                <p>
-                  未到:
-                  <span className="ml-2 inline-block min-w-6 text-base font-semibold leading-none">
-                    {scheduleSummary.noShow}
-                  </span>
+                <p className="mt-1 text-2xl leading-none md:text-3xl">
+                  {scheduleSummary.completed}
                 </p>
-              </div>
+              </section>
+
+              <section className="bg-white px-3 py-3 text-black">
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
+                  未到
+                </p>
+                <p className="mt-1 text-2xl leading-none md:text-3xl">{scheduleSummary.noShow}</p>
+              </section>
             </div>
           </Card>
 
@@ -307,37 +308,64 @@ function AdminDashboard() {
                             const isPending = booking.status === "booked";
                             const isBlacklisted = Boolean(user?.isBlacklisted);
                             const isBooked = booking.status === "booked";
+                            const bookingTypeLabel =
+                              booking.type === "walk-in" ? "現場預約" : "線上預約";
+                            const depositLabel = booking.isDepositPaid
+                              ? "已付訂金"
+                              : "未付訂金";
 
                             return (
                               <article
                                 key={booking.id}
-                                className={`border-2 border-black p-3 ${
+                                className={`border-2 border-black p-3 md:p-4 ${
                                   isBooked ? "bg-black text-white" : "bg-white text-black"
                                 }`}
                               >
                                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                                  <div className="space-y-2">
+                                  <div className="space-y-2.5">
                                     <div className="flex flex-wrap items-center gap-2">
-                                      <p className="font-mono text-sm">{booking.timeSlot}</p>
-                                      <p className="text-sm">{booking.displayName || "未知客人"}</p>
+                                      <p className="font-mono text-lg leading-none">
+                                        {booking.timeSlot}
+                                      </p>
+                                      <p className="text-base leading-none">
+                                        {booking.displayName || "未知客人"}
+                                      </p>
                                     </div>
 
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <Badge variant={statusVariantMap[booking.status]}>
+                                    <p
+                                      className={`font-mono text-[11px] tracking-[0.08em] ${
+                                        isBooked ? "text-white/75" : "text-neutral-600"
+                                      }`}
+                                    >
+                                      LINE ID: {booking.lineUserId}
+                                    </p>
+
+                                    <div className="flex flex-wrap items-center gap-1.5">
+                                      <Badge
+                                        variant={statusVariantMap[booking.status]}
+                                        className="px-1.5 py-0.5 text-[10px] tracking-[0.08em]"
+                                      >
                                         {statusLabelMap[booking.status] || booking.status}
                                       </Badge>
                                       <Badge
-                                        variant={booking.type === "online" ? "inverted" : "default"}
+                                        className={`px-1.5 py-0.5 text-[10px] tracking-[0.08em] ${
+                                          isBooked ? "border-white bg-transparent text-white" : ""
+                                        }`}
                                       >
-                                        {booking.type === "walk-in" ? "現場預約" : "線上預約"}
+                                        {bookingTypeLabel}
                                       </Badge>
                                       <Badge
-                                        variant={booking.isDepositPaid ? "inverted" : "muted"}
+                                        className={`px-1.5 py-0.5 text-[10px] tracking-[0.08em] ${
+                                          isBooked ? "border-white bg-transparent text-white" : ""
+                                        }`}
                                       >
-                                        {booking.isDepositPaid ? "已付訂金" : "未付訂金"}
+                                        {depositLabel}
                                       </Badge>
                                       {isBlacklisted && (
-                                        <Badge variant="muted" className="w-fit">
+                                        <Badge
+                                          variant="muted"
+                                          className="w-fit px-1.5 py-0.5 text-[10px] tracking-[0.08em]"
+                                        >
                                           黑名單
                                         </Badge>
                                       )}
@@ -345,7 +373,7 @@ function AdminDashboard() {
 
                                     {user?.notes && (
                                       <p
-                                        className={`border px-2 py-1 whitespace-pre-line font-mono text-[11px] ${
+                                        className={`border px-2 py-1 whitespace-pre-line font-mono text-[10px] ${
                                           isBooked
                                             ? "border-white/70 text-white/85"
                                             : "border-neutral-300 text-neutral-700"
@@ -356,12 +384,12 @@ function AdminDashboard() {
                                     )}
                                   </div>
 
-                                  <div className="flex gap-2 md:flex-col">
+                                  <div className="flex gap-2 md:flex-col md:items-end">
                                     <Button
                                       variant="outline"
                                       disabled={!isPending}
                                       onClick={() => handleCheckIn(booking.id)}
-                                      className={`min-h-8 px-3 py-2 text-[10px] tracking-[0.08em] ${
+                                      className={`min-h-8 whitespace-nowrap px-3 py-1 text-[10px] tracking-[0.08em] ${
                                         isBooked
                                           ? "border-white bg-white text-black hover:bg-neutral-100 hover:text-black"
                                           : ""
@@ -373,7 +401,7 @@ function AdminDashboard() {
                                       variant="outline"
                                       disabled={!isPending}
                                       onClick={() => handleStrike(booking.id)}
-                                      className={`min-h-8 px-3 py-2 text-[10px] tracking-[0.08em] ${
+                                      className={`min-h-8 whitespace-nowrap px-3 py-1 text-[10px] tracking-[0.08em] ${
                                         isBooked
                                           ? "border-white bg-white text-black hover:bg-neutral-100 hover:text-black"
                                           : ""
