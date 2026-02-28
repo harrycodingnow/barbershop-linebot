@@ -247,51 +247,35 @@ function AdminDashboard() {
               </p>
               <Badge>{selectedDateLabel}</Badge>
             </div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-neutral-600">
-              Focus: 待到店
-            </p>
-
-            <div className="grid grid-cols-1 border border-black md:grid-cols-12">
-              <section className="border-b border-black bg-black p-3 text-white md:col-span-6 md:border-b-0 md:border-r md:p-4">
-                <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/80">
-                  待到店
+            <div className="border border-black">
+              <div className="flex flex-wrap items-center gap-4 border-b border-black px-3 py-2 font-mono text-sm">
+                <p>
+                  待到店:
+                  <span className="ml-2 inline-block min-w-6 text-lg font-semibold leading-none">
+                    {scheduleSummary.pending}
+                  </span>
                 </p>
-                <p className="mt-1 text-3xl leading-none md:mt-2 md:text-6xl">
-                  {scheduleSummary.pending}
+                <p>
+                  總數:
+                  <span className="ml-2 inline-block min-w-6 text-lg font-semibold leading-none">
+                    {scheduleSummary.total}
+                  </span>
                 </p>
-                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.08em] text-white/70 md:mt-3 md:text-[11px]">
-                  需要處理
+              </div>
+              <div className="grid grid-cols-2 gap-3 px-3 py-2 font-mono text-sm">
+                <p>
+                  已到:
+                  <span className="ml-2 inline-block min-w-6 text-base font-semibold leading-none">
+                    {scheduleSummary.completed}
+                  </span>
                 </p>
-              </section>
-
-              <section className="md:col-span-6">
-                <div className="grid grid-cols-1 md:grid-cols-3">
-                  <div className="border-b border-black p-3 md:border-b-0 md:border-r md:p-4">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
-                      總數
-                    </p>
-                    <p className="mt-1 text-2xl leading-none md:mt-2 md:text-3xl">
-                      {scheduleSummary.total}
-                    </p>
-                  </div>
-                  <div className="border-b border-black p-3 md:border-b-0 md:border-r md:p-4">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
-                      已到
-                    </p>
-                    <p className="mt-1 text-2xl leading-none md:mt-2 md:text-3xl">
-                      {scheduleSummary.completed}
-                    </p>
-                  </div>
-                  <div className="p-3 md:p-4">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-neutral-600">
-                      未到
-                    </p>
-                    <p className="mt-1 text-2xl leading-none md:mt-2 md:text-3xl">
-                      {scheduleSummary.noShow}
-                    </p>
-                  </div>
-                </div>
-              </section>
+                <p>
+                  未到:
+                  <span className="ml-2 inline-block min-w-6 text-base font-semibold leading-none">
+                    {scheduleSummary.noShow}
+                  </span>
+                </p>
+              </div>
             </div>
           </Card>
 
