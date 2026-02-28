@@ -128,21 +128,27 @@ function WalkInBooking({ currentUser }) {
         )}
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {availableSlots.map((slot) => (
-            <Button
-              key={slot}
-              variant={selectedSlot === slot ? "selected" : "outline"}
-              onClick={() => {
-                if (existingBooking) return;
-                setSelectedSlot(slot);
-                setFeedback("");
-              }}
-              disabled={Boolean(existingBooking)}
-              className="w-full font-mono text-sm"
-            >
-              {slot}
-            </Button>
-          ))}
+          {availableSlots.map((slot) => {
+            const isActive = selectedSlot === slot;
+            return (
+              <Button
+                key={slot}
+                variant={isActive ? "selected" : "outline"}
+                onClick={() => {
+                  if (existingBooking) return;
+                  setSelectedSlot(slot);
+                  setFeedback("");
+                }}
+                aria-pressed={isActive}
+                disabled={Boolean(existingBooking)}
+                className={`w-full font-mono text-sm ${
+                  isActive ? "" : "hover:bg-neutral-100 hover:text-black"
+                }`}
+              >
+                {slot}
+              </Button>
+            );
+          })}
         </div>
 
         <div className="border-t border-black pt-4">

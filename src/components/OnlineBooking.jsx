@@ -122,7 +122,10 @@ function OnlineBooking({ currentUser }) {
                 key={slot}
                 variant={isActive ? "selected" : "outline"}
                 onClick={() => setSelectedSlot(slot)}
-                className="w-full font-mono text-sm"
+                aria-pressed={isActive}
+                className={`w-full font-mono text-sm ${
+                  isActive ? "" : "hover:bg-neutral-100 hover:text-black"
+                }`}
               >
                 {slot}
               </Button>

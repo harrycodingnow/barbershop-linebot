@@ -71,7 +71,7 @@ function App() {
                 LIFF Demo / Local Storage Mode
               </p>
               <h1 className="font-display text-5xl tracking-tight md:text-7xl lg:text-8xl">
-                Salon Booking
+                塊裡我線上預約系統
               </h1>
               <p className="max-w-2xl text-base text-neutral-700 md:text-lg">
                 專為理髮店展示流程的預約系統。所有狀態與紀錄都儲存在瀏覽器本機。
