@@ -62,30 +62,6 @@ function App() {
                 <span className="block italic pr-4 mt-2 text-4xl md:text-5xl text-sage">線上等候系統</span>
               </h1>
             </div>
-            {/* View Switchers */}
-            <nav className="flex flex-wrap gap-3">
-              <Button
-                onClick={() => navigateToView("customer")}
-                variant={view === "customer" ? "primary" : "outline"}
-                className="text-xs md:text-sm px-4 md:px-6"
-              >
-                客人端
-              </Button>
-              <Button
-                onClick={() => navigateToView("admin")}
-                variant={view === "admin" ? "primary" : "outline"}
-                className="text-xs md:text-sm px-4 md:px-6"
-              >
-                管理後台
-              </Button>
-              <Button
-                onClick={() => navigateToView("display")}
-                variant={view === "display" ? "primary" : "outline"}
-                className="text-xs md:text-sm px-4 md:px-6"
-              >
-                查看空擋
-              </Button>
-            </nav>
           </div>
         </header>
 

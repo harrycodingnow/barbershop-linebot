@@ -51,42 +51,33 @@ export default function QueueDisplayView({ navigateToView }) {
                         <p className="text-sage font-sans italic text-lg">目前無需等候，歡迎直接入座</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex flex-col gap-4 max-w-2xl mx-auto">
                         {upcomingTickets.map((ticket, index) => (
                             <div
                                 key={ticket.id}
-                                className={`bg-white rounded-3xl p-6 shadow-sm border border-stone flex flex-col items-center justify-center text-center transition-all duration-500
-                                    ${index === 0 ? 'ring-2 ring-terracotta/30 bg-terracotta/5 scale-105' : 'hover:bg-alabaster'}`}
+                                className={`bg-white rounded-full px-8 py-4 shadow-sm border border-stone flex items-center justify-between transition-all duration-500
+                                    ${index === 0 ? 'ring-2 ring-terracotta/30 bg-terracotta/5 scale-[1.02]' : 'hover:bg-alabaster'}`}
                             >
-                                {index === 0 && (
-                                    <span className="text-[10px] text-terracotta uppercase tracking-widest font-bold mb-3 bg-white px-3 py-1 rounded-full shadow-sm border border-terracotta/20">
-                                        下一位
-                                    </span>
-                                )}
-                                <div className="text-4xl font-display text-sage mb-2">
-                                    #{ticket.ticketNumber}
+                                <div className="flex items-center gap-6">
+                                    <div className="w-16 text-3xl font-display text-sage font-semibold">
+                                        #{ticket.ticketNumber}
+                                    </div>
+                                    <div className="font-semibold text-forest text-lg">
+                                        {ticket.displayName}
+                                    </div>
                                 </div>
-                                <div className="font-semibold text-forest text-lg truncate w-full px-4">
-                                    {ticket.displayName}
-                                </div>
-                                <div className="text-xs text-sage/70 font-sans mt-3">
-                                    取號: {new Date(ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                <div className="text-xs text-sage/70 font-sans text-right">
+                                    {index === 0 && (
+                                        <span className="text-[10px] text-terracotta uppercase tracking-widest font-bold bg-white px-3 py-1 rounded-full shadow-sm border border-terracotta/20 mr-4">
+                                            下一位
+                                        </span>
+                                    )}
+                                    {new Date(ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
-
-            {/* Bottom Section: Call to Action */}
-            <div className="pt-8 text-center animate-in slide-in-from-bottom-8 duration-700 delay-300">
-                <Button
-                    onClick={() => navigateToView("customer")}
-                    variant="primary"
-                    className="w-full md:w-auto md:px-24 py-5 text-xl tracking-widest uppercase shadow-lg hover:scale-105 transition-transform duration-300"
-                >
-                    抽取專屬號碼牌
-                </Button>
             </div>
 
         </div>
