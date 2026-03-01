@@ -44,7 +44,7 @@ function App() {
       case "admin":
         return <AdminView />;
       case "display":
-        return <QueueDisplayView />;
+        return <QueueDisplayView navigateToView={navigateToView} />;
       case "customer":
       default:
         return <CustomerView />;

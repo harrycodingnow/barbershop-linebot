@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import Button from "./ui/Button";
 import { TicketService } from "../utils/storage";
 
-export default function QueueDisplayView() {
+export default function QueueDisplayView({ navigateToView }) {
     const [queueStatus, setQueueStatus] = useState(TicketService.getQueueStatus());
 
     // Refresh status from storage whenever it changes or on mount
@@ -75,6 +76,17 @@ export default function QueueDisplayView() {
                         ))}
                     </div>
                 )}
+            </div>
+
+            {/* Bottom Section: Call to Action */}
+            <div className="pt-8 text-center animate-in slide-in-from-bottom-8 duration-700 delay-300">
+                <Button
+                    onClick={() => navigateToView("customer")}
+                    variant="primary"
+                    className="w-full md:w-auto md:px-24 py-5 text-xl tracking-widest uppercase shadow-lg hover:scale-105 transition-transform duration-300"
+                >
+                    抽取專屬號碼牌
+                </Button>
             </div>
 
         </div>
