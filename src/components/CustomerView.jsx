@@ -90,25 +90,11 @@ export default function CustomerView() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-stone pt-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-stone pt-8">
                             <div className="flex flex-col items-center justify-center p-4">
                                 <span className="text-sage text-xs uppercase tracking-widest mb-2 font-semibold">目前叫號</span>
                                 <span className="font-display text-4xl text-forest">#{status.currentCalledNumber}</span>
                             </div>
-
-                            {status.ticket.status === 'waiting' ? (
-                                <div className="flex flex-col items-center justify-center p-4 bg-alabaster rounded-3xl border border-stone">
-                                    <span className="text-terracotta text-xs uppercase tracking-widest mb-2 font-semibold">前方等待</span>
-                                    <span className="font-display text-4xl text-terracotta mb-2">{status.peopleAhead} <span className="text-sm font-sans italic text-sage ml-1">人</span></span>
-                                    <span className="text-[10px] text-sage w-full text-center tracking-widest uppercase bg-stone/50 py-1.5 rounded-full mt-2 font-semibold">
-                                        預估等候 {status.peopleAhead * 15} 分鐘
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center p-4">
-                                    <span className="text-sage text-xs uppercase tracking-widest mb-2 font-semibold">-</span>
-                                </div>
-                            )}
 
                             <div className="flex flex-col items-center justify-center p-4">
                                 <span className="text-sage text-xs uppercase tracking-widest mb-2 font-semibold">抽號時間</span>

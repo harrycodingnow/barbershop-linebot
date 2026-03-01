@@ -98,7 +98,7 @@ export const TicketService = {
   // 1. 抽號碼牌 (Create Ticket)
   createTicket: (lineUserId, displayName) => {
     const data = readSalonData();
-    
+
     // 檢查該客人是否已經有 waiting 或 called 的單子
     const activeTicket = data.tickets.find(
       (t) => t.lineUserId === lineUserId && (t.status === "waiting" || t.status === "called")
@@ -128,7 +128,7 @@ export const TicketService = {
     data.tickets.push(newTicket);
     saveSalonData(data);
     notifyDataChanged();
-    
+
     return { success: true, ticket: newTicket };
   },
 
@@ -147,7 +147,7 @@ export const TicketService = {
     ).length;
 
     // 取得當前正在處理的號碼 (最後一個被called的，或是沒有called的話傳回0或null)
-    const calledTickets = data.tickets.filter(t => t.status === "called").sort((a,b) => b.ticketNumber - a.ticketNumber);
+    const calledTickets = data.tickets.filter(t => t.status === "called").sort((a, b) => b.ticketNumber - a.ticketNumber);
     const currentCalledNumber = calledTickets.length > 0 ? calledTickets[0].ticketNumber : 0;
 
     return {
@@ -178,10 +178,10 @@ export const TicketService = {
   // 4. 取得整體候位狀態 - 店家端
   getQueueStatus: () => {
     const data = readSalonData();
-    
-    const waitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a,b) => a.ticketNumber - b.ticketNumber);
-    const calledTickets = data.tickets.filter(t => t.status === "called").sort((a,b) => b.ticketNumber - a.ticketNumber); // Descending by number
-    const completedTickets = data.tickets.filter(t => t.status === "completed").sort((a,b) => b.ticketNumber - a.ticketNumber);
+
+    const waitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a, b) => a.ticketNumber - b.ticketNumber);
+    const calledTickets = data.tickets.filter(t => t.status === "called").sort((a, b) => b.ticketNumber - a.ticketNumber); // Descending by number
+    const completedTickets = data.tickets.filter(t => t.status === "completed").sort((a, b) => b.ticketNumber - a.ticketNumber);
 
     const currentCalledNumber = calledTickets.length > 0 ? calledTickets[0].ticketNumber : (completedTickets.length > 0 ? completedTickets[0].ticketNumber : 0);
     const totalWaiting = waitingTickets.length;
@@ -191,7 +191,7 @@ export const TicketService = {
       totalWaiting,
       waitingTickets,
       calledTickets,
-      activeTickets: data.tickets.filter(t => t.status === "waiting" || t.status === "called").sort((a,b) => a.ticketNumber - b.ticketNumber)
+      activeTickets: data.tickets.filter(t => t.status === "waiting" || t.status === "called").sort((a, b) => a.ticketNumber - b.ticketNumber)
     };
   },
 
@@ -199,10 +199,10 @@ export const TicketService = {
   callNext: () => {
     const data = readSalonData();
     // 找出目前號碼最小、且狀態為 waiting 的號碼
-    const waitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a,b) => a.ticketNumber - b.ticketNumber);
-    
+    const waitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a, b) => a.ticketNumber - b.ticketNumber);
+
     if (waitingTickets.length === 0) {
-       return { success: false, error: "沒有人正在等候。" };
+      return { success: false, error: "沒有人正在等候。" };
     }
 
     const nextTicket = waitingTickets[0];
@@ -212,13 +212,13 @@ export const TicketService = {
     // 更新資料庫
     const ticketIndex = data.tickets.findIndex(t => t.id === nextTicket.id);
     data.tickets[ticketIndex] = nextTicket;
-    
+
     saveSalonData(data);
     notifyDataChanged();
 
     // 準備推播訊息 (Mock)
     const notifications = [];
-    
+
     // 推播 1: 到號通知
     notifications.push({
       lineUserId: nextTicket.lineUserId,
@@ -227,20 +227,20 @@ export const TicketService = {
 
     // 推播 2: 快到號預先提醒 (前面只剩2位，所以是呼叫後，排在第2位的waiting客人)
     // 重新取得 waiting list
-    const updatedWaitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a,b) => a.ticketNumber - b.ticketNumber);
+    const updatedWaitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a, b) => a.ticketNumber - b.ticketNumber);
     if (updatedWaitingTickets.length >= 2) {
       // index 1 就是前方剩下兩位(index 0 是一位, 包含剛被叫的就不在waiting了)
       // 若是"剛好在前方剩下2人時提醒"，那代表他的位置是 updatedWaitingTickets[1]
-      const reminderTicket = updatedWaitingTickets[1]; 
+      const reminderTicket = updatedWaitingTickets[1];
       notifications.push({
-         lineUserId: reminderTicket.lineUserId,
-         message: `🔔 快到號提醒：您的號碼 #${reminderTicket.ticketNumber} 前面只剩 2 位，請準備前往店內。`
+        lineUserId: reminderTicket.lineUserId,
+        message: `🔔 快到號提醒：您的號碼 #${reminderTicket.ticketNumber} 前面只剩 2 位，請準備前往店內。`
       });
     }
 
     // TODO: 發送 Event 讓前端 Mock 推播
     if (typeof window !== "undefined" && notifications.length > 0) {
-        window.dispatchEvent(new CustomEvent('mock_push_notification', { detail: notifications }));
+      window.dispatchEvent(new CustomEvent('mock_push_notification', { detail: notifications }));
     }
 
     return { success: true, ticket: nextTicket, notifications };
@@ -252,8 +252,23 @@ export const TicketService = {
     const activeIndex = data.tickets.findIndex(t => t.id === ticketId);
 
     if (activeIndex === -1) return { success: false, error: "找不到該號碼牌。" };
-    
-    data.tickets[activeIndex].status = newStatus;
+
+    if (newStatus === "skipped") {
+      // 客人過號：插到等待中的最後一號
+      const oldTicketNumber = data.tickets[activeIndex].ticketNumber;
+      data.lastTicketNumber += 1;
+      data.tickets[activeIndex].ticketNumber = data.lastTicketNumber;
+      data.tickets[activeIndex].status = "waiting";
+      data.tickets[activeIndex].createdAt = new Date().toISOString(); // 更新時間
+
+      // 更新名稱加上過號標記
+      const currentName = data.tickets[activeIndex].displayName;
+      const baseName = currentName.replace(/\s*\(原 #\d+ 號過號\)/, '');
+      data.tickets[activeIndex].displayName = `${baseName} (原 #${oldTicketNumber} 號過號)`;
+    } else {
+      data.tickets[activeIndex].status = newStatus;
+    }
+
     saveSalonData(data);
     notifyDataChanged();
 

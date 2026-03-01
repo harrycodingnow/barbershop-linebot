@@ -54,12 +54,9 @@ function App() {
         <header className="space-y-6 border-b border-stone pb-8 pt-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-4">
-              <p className="font-sans text-xs uppercase tracking-[0.2em] text-sage font-medium">
-                Live Queueing MVP
-              </p>
               <h1 className="font-display text-5xl tracking-tight md:text-6xl lg:text-7xl text-forest">
-                <span className="block italic pr-4">Salon</span>
-                <span className="block font-semibold mt-2">快理我</span>
+                <span className="block font-semibold">快理我</span>
+                <span className="block italic pr-4 mt-2 text-4xl md:text-5xl text-sage">線上等候系統</span>
               </h1>
             </div>
           </div>
