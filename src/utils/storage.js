@@ -34,8 +34,10 @@ export const initSalonData = () => {
 };
 
 // 2. Synchronous read from the constantly updated local cache
+// We MUST return a deep clone here because React components use reference equality
+// (like `setQueueStatus(data)`) to determine whether to re-render.
 export const readSalonData = () => {
-  return localCache;
+  return JSON.parse(JSON.stringify(localCache));
 };
 
 // 3. Write updates back to Firestore
