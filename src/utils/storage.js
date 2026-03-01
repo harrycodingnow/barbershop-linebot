@@ -1,80 +1,63 @@
-export const STORAGE_KEY = "salon_queue_data";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
+import { db } from "./firebase";
 
+// Default state structure
 const getDefaultData = () => ({
   tickets: [],
   users: {},
-  // Tracks the daily sequence number. In a real app, this resets daily.
   lastTicketNumber: 0,
 });
 
-const hasStorage = () => typeof window !== "undefined" && !!window.localStorage;
+// Since Components expect synchronous reads, we keep a local cache.
+let localCache = getDefaultData();
 
-const normalizeSalonData = (rawData) => {
-  const defaultData = getDefaultData();
-  if (!rawData || typeof rawData !== "object") return defaultData;
+// Document reference in Firestore
+const SALON_DOC_ID = "salon/demo";
+const docRef = doc(db, SALON_DOC_ID);
 
-  return {
-    tickets: Array.isArray(rawData.tickets) ? rawData.tickets : [],
-    users: rawData.users && typeof rawData.users === "object" ? rawData.users : {},
-    lastTicketNumber: typeof rawData.lastTicketNumber === "number" ? rawData.lastTicketNumber : 0,
-  };
+// 1. Initialize Firebase listener to sync local cache automatically
+export const initSalonData = () => {
+  onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      localCache = { ...getDefaultData(), ...docSnap.data() };
+    } else {
+      // First time setup: push default data to Firebase
+      setDoc(docRef, getDefaultData());
+    }
+    // Notify components that data has updated
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event('salon_data_updated'));
+    }
+  });
+
+  return localCache;
 };
 
-export const initSalonData = () => {
-  if (!hasStorage()) return getDefaultData();
+// 2. Synchronous read from the constantly updated local cache
+export const readSalonData = () => {
+  return localCache;
+};
 
+// 3. Write updates back to Firestore
+export const saveSalonData = async (data) => {
+  localCache = data; // Optimistic update
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      const initialData = getDefaultData();
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
-      return initialData;
-    }
-
-    const parsed = JSON.parse(raw);
-    const normalized = normalizeSalonData(parsed);
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-    return normalized;
-  } catch (error) {
-    const fallback = getDefaultData();
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
-    return fallback;
+    await setDoc(docRef, data);
+  } catch (e) {
+    console.error("Error saving to Firebase:", e);
   }
 };
 
-export const readSalonData = () => {
-  if (!hasStorage()) return getDefaultData();
-  const initializedData = initSalonData();
-  return normalizeSalonData(initializedData);
-};
-
-export const saveSalonData = (data) => {
-  if (!hasStorage()) return;
-  const normalized = normalizeSalonData(data);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-};
-
-export const resetSalonData = () => {
+export const resetSalonData = async () => {
   const defaultData = getDefaultData();
-  if (!hasStorage()) return defaultData;
-
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
-  // Dispatch a custom event so other views can sink
-  window.dispatchEvent(new Event('salon_data_updated'));
+  await saveSalonData(defaultData);
   return defaultData;
 };
 
 const buildTicketId = () =>
   `tkt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-// Helper to notify other components (since they are on the same page but different views)
-const notifyDataChanged = () => {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event('salon_data_updated'));
-  }
-};
-
-export const upsertUser = (lineUserId, userPatch) => {
+export const upsertUser = async (lineUserId, userPatch) => {
   const data = readSalonData();
   const existing = data.users[lineUserId] ?? {
     displayName: userPatch?.displayName ?? "未知客人",
@@ -86,13 +69,14 @@ export const upsertUser = (lineUserId, userPatch) => {
     ...existing,
     ...userPatch
   };
-  saveSalonData(data);
-  notifyDataChanged();
+  await saveSalonData(data);
   return data.users[lineUserId];
 };
 
 /**
  * 核心的 TicketService，負責處理抽號碼牌的各項邏輯
+ * 介面 (API) 維持不變，但底層改為 async 寫入 Firestore。
+ * UI 元件不一定要 `await` 因為內部有 Optimistic Update，畫面會由 onSnapshot 觸發重繪。
  */
 export const TicketService = {
   // 1. 抽號碼牌 (Create Ticket)
@@ -126,8 +110,7 @@ export const TicketService = {
     };
 
     data.tickets.push(newTicket);
-    saveSalonData(data);
-    notifyDataChanged();
+    saveSalonData(data); // Async write to FB, but localCache is instantly updated.
 
     return { success: true, ticket: newTicket };
   },
@@ -146,7 +129,7 @@ export const TicketService = {
       (t) => t.status === "waiting" && t.ticketNumber < activeTicket.ticketNumber
     ).length;
 
-    // 取得當前正在處理的號碼 (最後一個被called的，或是沒有called的話傳回0或null)
+    // 取得當前正在處理的號碼
     const calledTickets = data.tickets.filter(t => t.status === "called").sort((a, b) => b.ticketNumber - a.ticketNumber);
     const currentCalledNumber = calledTickets.length > 0 ? calledTickets[0].ticketNumber : 0;
 
@@ -169,7 +152,6 @@ export const TicketService = {
 
     data.tickets[activeIndex].status = "cancelled";
     saveSalonData(data);
-    notifyDataChanged();
     return { success: true, ticket: data.tickets[activeIndex] };
   },
 
@@ -180,7 +162,7 @@ export const TicketService = {
     const data = readSalonData();
 
     const waitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a, b) => a.ticketNumber - b.ticketNumber);
-    const calledTickets = data.tickets.filter(t => t.status === "called").sort((a, b) => b.ticketNumber - a.ticketNumber); // Descending by number
+    const calledTickets = data.tickets.filter(t => t.status === "called").sort((a, b) => b.ticketNumber - a.ticketNumber);
     const completedTickets = data.tickets.filter(t => t.status === "completed").sort((a, b) => b.ticketNumber - a.ticketNumber);
 
     const currentCalledNumber = calledTickets.length > 0 ? calledTickets[0].ticketNumber : (completedTickets.length > 0 ? completedTickets[0].ticketNumber : 0);
@@ -198,7 +180,6 @@ export const TicketService = {
   // 5. 呼叫下一號 (Call Next) - 店家端
   callNext: () => {
     const data = readSalonData();
-    // 找出目前號碼最小、且狀態為 waiting 的號碼
     const waitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a, b) => a.ticketNumber - b.ticketNumber);
 
     if (waitingTickets.length === 0) {
@@ -209,28 +190,20 @@ export const TicketService = {
     nextTicket.status = "called";
     nextTicket.calledAt = new Date().toISOString();
 
-    // 更新資料庫
     const ticketIndex = data.tickets.findIndex(t => t.id === nextTicket.id);
     data.tickets[ticketIndex] = nextTicket;
 
     saveSalonData(data);
-    notifyDataChanged();
 
-    // 準備推播訊息 (Mock)
+    // Mock Push Notifications Logic
     const notifications = [];
-
-    // 推播 1: 到號通知
     notifications.push({
       lineUserId: nextTicket.lineUserId,
       message: `🔔 輪到您了！您的號碼是 #${nextTicket.ticketNumber}，請向店內報到。`
     });
 
-    // 推播 2: 快到號預先提醒 (前面只剩2位，所以是呼叫後，排在第2位的waiting客人)
-    // 重新取得 waiting list
     const updatedWaitingTickets = data.tickets.filter(t => t.status === "waiting").sort((a, b) => a.ticketNumber - b.ticketNumber);
     if (updatedWaitingTickets.length >= 2) {
-      // index 1 就是前方剩下兩位(index 0 是一位, 包含剛被叫的就不在waiting了)
-      // 若是"剛好在前方剩下2人時提醒"，那代表他的位置是 updatedWaitingTickets[1]
       const reminderTicket = updatedWaitingTickets[1];
       notifications.push({
         lineUserId: reminderTicket.lineUserId,
@@ -238,7 +211,6 @@ export const TicketService = {
       });
     }
 
-    // TODO: 發送 Event 讓前端 Mock 推播
     if (typeof window !== "undefined" && notifications.length > 0) {
       window.dispatchEvent(new CustomEvent('mock_push_notification', { detail: notifications }));
     }
@@ -254,14 +226,12 @@ export const TicketService = {
     if (activeIndex === -1) return { success: false, error: "找不到該號碼牌。" };
 
     if (newStatus === "skipped") {
-      // 客人過號：插到等待中的最後一號
       const oldTicketNumber = data.tickets[activeIndex].ticketNumber;
       data.lastTicketNumber += 1;
       data.tickets[activeIndex].ticketNumber = data.lastTicketNumber;
       data.tickets[activeIndex].status = "waiting";
-      data.tickets[activeIndex].createdAt = new Date().toISOString(); // 更新時間
+      data.tickets[activeIndex].createdAt = new Date().toISOString();
 
-      // 更新名稱加上過號標記
       const currentName = data.tickets[activeIndex].displayName;
       const baseName = currentName.replace(/\s*\(原 #\d+ 號過號\)/, '');
       data.tickets[activeIndex].displayName = `${baseName} (原 #${oldTicketNumber} 號過號)`;
@@ -270,13 +240,12 @@ export const TicketService = {
     }
 
     saveSalonData(data);
-    notifyDataChanged();
 
     return { success: true, ticket: data.tickets[activeIndex] };
   },
 
   // 7. 每日重置 - 店家端
   resetDailyQueue: () => {
-    return resetSalonData(); // 我們直接把整個 storage 覆蓋掉
+    return resetSalonData();
   }
 };
